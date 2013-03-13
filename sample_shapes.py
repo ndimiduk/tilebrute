@@ -56,6 +56,10 @@ def bbox(geom):
 # job code
 
 def read_feature(file):
+    """
+    Read a single feature from the input source. Expects to find a geometry
+    and a population count. yield (org.Geometry, int(population))
+    """
     reader = csv.reader(file, strict=True)
     for row in reader:
         if row[0].lower() == "wkt":
@@ -69,13 +73,9 @@ def read_feature(file):
         yield (geom, int(row[8]))
 
 def sample_geometry(geom, count):
-#    with open('/tmp/shape.csv', 'w') as f:
-#        w = csv.writer(f, dialect='excel-tab')
-#        w.writerow(['wkt'])
-#        w.writerow([geom])
-#    with open('/tmp/samples.csv', 'w') as f:
-#        w = csv.writer(f, dialect='excel-tab')
-#        w.writerow(['wkt'])
+    """
+    Given a Geometry and count, returns count Points contained by that geom.
+    """
     ll,bb,rr,tt = bbox(geom)
     point = None
     for i in range(count):
@@ -86,27 +86,22 @@ def sample_geometry(geom, count):
                 break
             else:
                 inc_counter("sample_geometry", "fail_sample")
-#        w.writerow([point])
         yield (point.GetX(), point.GetY())
 
-def latlng_to_tilep(lat, lng, zoom):
-    mx, my = _merc.LatLonToMeters(lat, lng)
-    px, py = _merc.MetersToPixels(mx, my, zoom)
-    tx, ty = _merc.PixelsToTile(px, py)
-    tile = _merc.QuadTree(tx, ty, zoom)
-    x = int(round(px - (tx * _merc.tileSize)))
-    y = int(round(py - (ty * _merc.tileSize)))
-    return (tile,x,y)
-
-def make_kv(lng, lat, sep="\t"):
+def make_kv(lat, lng):
+    """
+    Yield all the (tile,x,y)s for the lng,lat pair at various zoom levels.
+    Converts lng,lat into meters.
+    """
     for z in _zooms:
-        hash,px,py = latlng_to_tilep(lat, lng, z)
-        key = hash
-        value = "%s%s%s" % (px,sep,py)
+        mx,my = _merc.LatLonToMeters(lat, lng)
+        tx,ty = _merc.MetersToTile(mx, my, z)
+        key = "%d,%d,%d" % (tx,ty,z)
+        value = "%s\t%s" % (mx,my)
         yield (key, value)
 
 if __name__=='__main__':
     for geom, population in read_feature(stdin):
         for lng, lat in sample_geometry(geom, population):
-            for key, val in make_kv(lng=lng, lat=lat):
+            for key, val in make_kv(lat, lng):
                 emit(key, val)

@@ -1,13 +1,21 @@
 #!/usr/bin/env python
 
+import base64
 import csv
-import ogr
+import io
+import mapnik
 
 from gdal2tiles import GlobalMercator
-from random import uniform
+from shapely.geometry import box, Point
 from sys import stdin, stderr
 
+# quadkey[zoom -z]
+# quadkey[levelOfDetail -i]
+
 # hadoop helpers
+
+def log(msg):
+    print >> stderr, msg
 
 def print_status(msg):
     print >> stderr, "reporter:status:%s" % msg
@@ -20,59 +28,119 @@ def emit(key, val):
 
 # geo helpers
 
-def quadkey_to_tileXY(quadkey):
-    tx = 0
-    ty = 0
-    zoom = len(quadkey)
+_merc = GlobalMercator()
+# spherical mercator
+_merc_srs = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over<>'
+#_merc_srs = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over'
 
-    for z in reversed(range(zoom)):
-        mask = 1 << z
-        if quadkey[z] == '0':
+def max_coord(zoom):
+    return 256 * ((2**zoom) -1)
+
+def quadkey_to_tile_Box2d(quadkey):
+    tx,ty,zoom = quadkey_to_tileXY(quadkey)
+    minx,miny,maxx,maxy = _merc.TileBounds(tx, ty, zoom)
+    return mapnik.Box2d(minx, miny, maxx, maxy)
+
+def tile_to_meters_Box2d(tile):
+    tx,ty,z = [int(x) for x in tile.split(',')]
+    minx,miny,maxx,maxy = _merc.TileBounds(tx, ty, z)
+    b2d = mapnik.Box2d(minx, miny, maxx, maxy)
+    log("tile_to_meters_Box2d(%s) -> %s" % (tile, b2d))
+    return b2d
+
+class DatasourceError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+class TuplesDatasource(mapnik.PythonDatasource):
+    """
+    Generates mx,my Point data in Google Merc. Reads data points from `fid`
+    source, assumed to be CSV of tile,mx,my.
+    """
+
+    def __init__(self, fid, closefd=''):
+        """
+        Create a Datasource over the specified file handle. Be advised, C++
+        interop turns everything passes into Strings.
+        """
+        log("TuplesDatasource.__init__(%s, %s)" % (fid, closefd))
+
+        # create a buffered reader over the file handle
+        reader = io.BufferedReader(io.open(int(fid), mode='rb', closefd=bool(closefd)))
+
+        # read first line to determine tile; then reset the reader
+        for self.tile,_,_ in TuplesDatasource._read_points(reader):
             break
-        elif quadkey[z] == '1':
-            tx |= mask
-        elif quadkey[z] == '2':
-            ty |= mask
-        elif quadkey[z] == '3':
-            tx |= mask
-            ty |= mask
-    return (tx,ty,zoom)
+        reader.seek(0)
+        self.gen = TuplesDatasource._read_points(reader)
 
-_point_weight = {
-    4: 0.05333,
-    5: 0.08,
-    6: 0.12,
-    7: 0.18,
-    8: 0.27,
-    9: 0.405,
-    10: 0.6075,
-    11: 0.91125,
-    12: 1.366875,
-    13: 2.0503125,
-    14: 3.07546875,
-    15: 4.61320312,
-    16: 6.9198046,
-    17: 10.37970
-    }
+        # fill in required interface
+        self.envelope = tile_to_meters_Box2d(self.tile)
+        self.data_type = mapnik.DataType.Vector
+        super(TuplesDatasource, self).__init__(
+            envelope = self.envelope
+        )
+
+    @staticmethod
+    def _read_points(file):
+        reader = csv.reader(file, delimiter="\t", strict=True)
+        for rec in reader:
+            if len(rec) != 3:
+                inc_counter("read_points", "invalid_input")
+                continue
+            inc_counter("read_points", "point_count")
+            log("TuplesDatasource._read_points() -> ('%s','%s','%s')" % (rec[0],float(rec[1]),float(rec[2])))
+            yield (rec[0],float(rec[1]),float(rec[2]))
+
+    @staticmethod
+    def _points(src, expected_tile, bbox):
+        for tile, mx, my in src:
+            if not tile == expected_tile:
+                raise DatasourceError("Unexpected tile! Was reading '%s', read '%s'" % (expected_tile, tile))
+            p = Point(mx, my)
+            if not bbox.contains(p):
+                log("skipping point '%s'" % p)
+                continue
+            log("TuplesDatasource._points(_, '%s', '%s') -> '%s'" % (expected_tile, bbox, p))
+            yield (p.wkb, {})
+
+    def features(self, query):
+        log("TuplesDatasource.features(%s)" % query.bbox)
+
+        b = query.bbox
+        bbox = box(b.minx, b.miny, b.maxx, b.maxy)
+        return mapnik.PythonDatasource.wkb_features(
+            keys = (),
+            features = TuplesDatasource._points(self.gen, self.tile, bbox)
+        )
 
 # job code
 
-def read_points(file):
-    reader = csv.reader(file, delimiter="\t", strict=True)
-    for rec in reader:
-        if len(rec) != 3:
-            inc_counter("read_points", "invalid_input")
-        yield (rec[0],float(rec[1]),float(rec[2]))
-
-def append_point(tile, lat, lng):
-    if not tile:
-        tile = Image()
-        tile.size = (512,512)
+def init_map(file):
+    m = mapnik.Map(256, 256, _merc_srs)
+    m.background_color = mapnik.Color('white')
+    s = mapnik.Style()
+    r = mapnik.Rule()
+    r.symbols.append(mapnik.PointSymbolizer())
+    s.rules.append(r)
+    m.append_style('point_style', s)
+    ds = mapnik.Python(factory='TuplesDatasource', fid=file.fileno())
+    layer = mapnik.Layer('file', _merc_srs)
+    layer.datasource = ds
+    layer.styles.append('point_style')
+    m.layers.append(layer)
+    return m
 
 if __name__=='__main__':
-    prev_hash = None
-    for hash,lat,lng in read_points(stdin):
-        if prev_hash and prev_hash != hash:
-            raise Exception("reducer key missmatch!")
-        prev_hash = hash
-        
+    map = init_map(stdin)
+#    map.zoom_to_box(quadkey_to_Box2d(quadkey))
+    map.zoom_all()
+#    mapnik.render_to_file(map, 'map.png', 'png')
+    im = mapnik.Image(256,256)
+    mapnik.render(map,im)
+    print "%s\t%s" % (tile, base64.encode(im.tostring('png')))
+#    with open('map2.png', 'wb') as f:
+#        f.write(buff)
