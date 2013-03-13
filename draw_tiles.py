@@ -61,6 +61,24 @@ class TuplesDatasource(mapnik.PythonDatasource):
     source, assumed to be CSV of tile,mx,my.
     """
 
+    #
+    # using a static variable as a dirty hack to get data out of the
+    # Datasource instance.
+    #
+    _tile = None
+
+    @staticmethod
+    def _get_tile():
+        if not TuplesDatasource._tile:
+            raise DatasourceError("TuplesDatasource._tile not yet set!")
+        return TuplesDatasource._tile
+
+    @staticmethod
+    def _set_tile(tile):
+        if TuplesDatasource._tile:
+            raise DatasourceError("TuplesDatasource._tile already set!")
+        TuplesDatasource._tile = tile
+
     def __init__(self, fid, closefd=''):
         """
         Create a Datasource over the specified file handle. Be advised, C++
@@ -72,13 +90,14 @@ class TuplesDatasource(mapnik.PythonDatasource):
         reader = io.BufferedReader(io.open(int(fid), mode='rb', closefd=bool(closefd)))
 
         # read first line to determine tile; then reset the reader
-        for self.tile,_,_ in TuplesDatasource._read_points(reader):
+        for tile,_,_ in TuplesDatasource._read_points(reader):
             break
+        TuplesDatasource._set_tile(tile)
         reader.seek(0)
         self.gen = TuplesDatasource._read_points(reader)
 
         # fill in required interface
-        self.envelope = tile_to_meters_Box2d(self.tile)
+        self.envelope = tile_to_meters_Box2d(tile)
         self.data_type = mapnik.DataType.Vector
         super(TuplesDatasource, self).__init__(
             envelope = self.envelope
@@ -114,7 +133,7 @@ class TuplesDatasource(mapnik.PythonDatasource):
         bbox = box(b.minx, b.miny, b.maxx, b.maxy)
         return mapnik.PythonDatasource.wkb_features(
             keys = (),
-            features = TuplesDatasource._points(self.gen, self.tile, bbox)
+            features = TuplesDatasource._points(self.gen, TuplesDatasource._get_tile(), bbox)
         )
 
 # job code
@@ -134,13 +153,13 @@ def init_map(file):
     m.layers.append(layer)
     return m
 
+def encode_image(im):
+    s = base64.encodestring(im.tostring('png'))
+    return s.replace('\n','')
+
 if __name__=='__main__':
     map = init_map(stdin)
-#    map.zoom_to_box(quadkey_to_Box2d(quadkey))
     map.zoom_all()
-#    mapnik.render_to_file(map, 'map.png', 'png')
     im = mapnik.Image(256,256)
     mapnik.render(map,im)
-    print "%s\t%s" % (tile, base64.encode(im.tostring('png')))
-#    with open('map2.png', 'wb') as f:
-#        f.write(buff)
+    emit(TuplesDatasource._get_tile(), encode_image(im))
