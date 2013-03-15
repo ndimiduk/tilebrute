@@ -13,7 +13,7 @@ def print_status(msg):
     print >> stderr, "reporter:status:%s" % msg
 
 def inc_counter(group, counter):
-    print >> stderr, "reporter:counter:%s,%s,1" %(group, counter)
+    print >> stderr, "reporter:counter:_m_%s,%s,1" % (group, counter)
 
 def emit(key, val):
     print "%s\t%s" % (key, val)
