@@ -1,4 +1,13 @@
 #!/usr/bin/env python
+#
+# draw_tiles.py reads the output of sample_shapes.py and uses it to
+# render map tiles for the sampled points.
+#
+# Input data is assumed to be sorted such that all records for a
+# single key (tile) are presented as an uninterrupted sequence. Thus,
+# tiles are rendered one at a time as data streams through the
+# program.
+#
 
 import base64
 import csv
@@ -35,8 +44,7 @@ def tile_to_meters_Box2d(tile, _merc = GlobalMercator()):
     corresponding to that tile's extend in meters.
     """
     tx,ty,z = [int(x) for x in tile.split(',')]
-    minx,miny,maxx,maxy = _merc.TileBounds(tx, ty, z)
-    return mapnik.Box2d(minx, miny, maxx, maxy)
+    return mapnik.Box2d(*_merc.TileBounds(tx, ty, z))
 
 class Peekable:
     """
@@ -137,8 +145,7 @@ class TuplesDatasource(mapnik.PythonDatasource):
         self.data_type = mapnik.DataType.Vector
 
     def features(self, query):
-        b = query.bbox
-        bbox = box(b.minx, b.miny, b.maxx, b.maxy)
+        bbox = box(query.bbox.minx, query.bbox.miny, query.bbox.maxx, query.bbox.maxy)
         return mapnik.PythonDatasource.wkb_features(
             keys = (),
             features = TuplesDatasource._points(bbox)

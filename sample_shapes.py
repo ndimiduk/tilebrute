@@ -1,4 +1,19 @@
 #!/usr/bin/env python
+#
+# sample_shapes.py reads CVS input data and produces sampled points
+# representing that input.
+#
+# Input is assumed to be comma-separated, newline-delimited,
+# containing a geometry in WKT at field[0] and the population count at
+# field[8]. WKT coordinates are assumed to be EPSG:4326. Output
+# records are written to stdout as points sampled from the geometry.
+# They are line-oriented, one point per record. A record consists of a
+# "key", followed by a tab character, followed by a "value". Keys
+# define the tile in which the point resides, of the format
+# "tilex,tiley,zoom". Values are the sampled point, "mx,my" as meters
+# in EPSG:900913. Additional Hadoop control information is printed to
+# stderr; it can be safely ignored when running locally.
+#
 
 import csv
 import ogr
