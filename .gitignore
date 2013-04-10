@@ -1,4 +1,12 @@
+# python stuff
 *.pyc
 world.*
 110m-admin-0-countries*
 gdal2tiles.py
+out
+
+# java stuff
+target
+.classpath
+.project
+.settings
