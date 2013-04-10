@@ -20,7 +20,7 @@ import ogr
 
 from gdal2tiles import GlobalMercator
 from random import uniform
-from sys import stdin, stderr
+from sys import stdin, stderr, maxsize
 
 # hadoop helpers
 
@@ -70,6 +70,9 @@ def bbox(geom):
 
 # job code
 
+# increase buffers to account for really big geometries
+csv.field_size_limit(maxsize)
+
 def read_feature(file):
     """
     Read a single feature from the input source. Expects to find a geometry
@@ -112,7 +115,7 @@ def make_kv(lat, lng):
         mx,my = _merc.LatLonToMeters(lat, lng)
         tx,ty = _merc.MetersToTile(mx, my, z)
         key = "%d,%d,%d" % (tx,ty,z)
-        value = "%s\t%s" % (mx,my)
+        value = "%0.5f\t%0.5f" % (mx,my)
         yield (key, value)
 
 if __name__=='__main__':
