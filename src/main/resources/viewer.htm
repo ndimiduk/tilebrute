@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>tile-brute viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />
+    <!--[if lte IE 8]><link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.ie.css" /><![endif]-->
+    <link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css" />
+    <!--[if lt IE 9]><script src="assets/js/html5shiv.js"></script><![endif]-->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="http://twitter.github.io/bootstrap/assets/ico/favicon.png">
+  </head>
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#">tile-brute</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <!-- div class="well">
+            <h3>Current:</h3>
+            <span id="coords">&nbsp;</span>
+            <hr />
+            <h3>Zoom to:</h3>
+            <form>
+              <label>lat:</label>
+              <input type="text" id="lat" />
+              <label>lng:</label>
+              <input type="text" id="lng" />
+            </form>
+          </div><!--/.well-->
+        </div><!--/span-->
+        <div class="span9">
+          <div id="map1" style="width: 886px; height: 600px"></div>
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>tile-brute</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+    <script src="http://leafletjs.com/dist/leaflet.js"></script>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script>
+      var map1 = L.map('map1').setView([47.42809, -120.30029], 6);
+      L.tileLayer('../../../out/{z}/{x}/{y}.png', {
+        maxZoom: 8,
+        attribution: 'tile-brute viewer'
+      }).addTo(map1);
+      var popup = L.popup();
+      function onMapClick(e) {
+        popup.setLatLng(e.latlng)
+             .setContent("You clicked the map at " + e.latlng.toString())
+             .openOn(map1);
+      }
+      map1.on('click', onMapClick);
+      function onMapMove(e) {
+        $("coords").text(map1.getCenter());
+      }
+      map1.on('move', onMapMove);
+    </script>
+  </body>
+</html>

@@ -11,18 +11,16 @@
 #
 
 INPUT_FILES=${INPUT_FILES-'WA-epsg4326.csv.gz'}
-INPUT_LINE_LIMIT=${INPUT_LINE_LIMIT-'11'}
 OUTPUT_DIR=${OUTPUT_DIR-'out'}
 
 PYTHON_DIR="src/main/python"
 
 # clean the output directory if it exits
 [ -d "$OUTPUT_DIR" ] && rm -r "$OUTPUT_DIR"
-# limit the input size to INPUT_LINE_LIMIT records
-gzcat "$INPUT_FILES" | head -n "$INPUT_LINE_LIMIT" > /tmp/input.csv
 
-hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar \
-  -input /tmp/input.csv \
+time \
+  hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar \
+  -input "$INPUT_FILES" \
   -output "$OUTPUT_DIR" \
   -mapper "python ${PYTHON_DIR}/sample_shapes.py" \
   -reducer "python ${PYTHON_DIR}/draw_tiles.py" \
