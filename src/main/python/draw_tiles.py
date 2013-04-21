@@ -44,6 +44,7 @@ def tile_to_meters_Box2d(tile, _merc = GlobalMercator()):
     corresponding to that tile's extend in meters.
     """
     tx,ty,z = [int(x) for x in tile.split(',')]
+    tx,ty = _merc.GoogleTile(tx,ty,z)
     return mapnik.Box2d(*_merc.TileBounds(tx, ty, z))
 
 class Peekable:

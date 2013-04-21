@@ -36,7 +36,7 @@ def emit(key, val):
 # geo helpers
 
 _merc = GlobalMercator()
-_zooms = (16,17,)
+_zooms = (6,7,8)
 
 def make_point(x, y):
     return ogr.Geometry(wkt="POINT(%f %f)" % (x, y))
@@ -108,12 +108,13 @@ def sample_geometry(geom, count):
 
 def make_kv(lat, lng):
     """
-    Yield all the (tile,x,y)s for the lng,lat pair at various zoom levels.
+    Yield all the Google (tile,x,y)'s for the lng,lat pair at various zoom levels.
     Converts lng,lat into meters.
     """
     for z in _zooms:
         mx,my = _merc.LatLonToMeters(lat, lng)
         tx,ty = _merc.MetersToTile(mx, my, z)
+        tx,ty = _merc.GoogleTile(tx,ty,z)
         key = "%d,%d,%d" % (tx,ty,z)
         value = "%0.5f\t%0.5f" % (mx,my)
         yield (key, value)
