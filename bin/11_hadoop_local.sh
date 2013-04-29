@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # 01_hadoop_local.sh run the same demonstration of map-reduce
 # streaming, using real Hadoop in local mode.

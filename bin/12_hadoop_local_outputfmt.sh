@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # 02_hadoop_local_outputfmt.sh run the same demonstration of
 # map-reduce streaming with Hadoop in local mode. Use a custom

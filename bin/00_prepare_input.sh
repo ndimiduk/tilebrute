@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/bash -e
 #
 # Generate a CSV from an input shapefile, reprojecetd into EPSG:4326
 # (WGS84 lat,lng coordinates). Geometries are preserved as pre-pended
