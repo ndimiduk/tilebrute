@@ -10,19 +10,15 @@
 # records and a count of their number to stdout.
 #
 
-INPUT_FILES=${INPUT_FILES-'WA-epsg4326.csv.gz'}
-INPUT_LINE_LIMIT=${INPUT_LINE_LIMIT-'11'}
-OUTPUT_DIR=${WRITE_TILES_OUT-'out'}
+BIN=$(dirname $0)
+BIN=$(cd $BIN > /dev/null ; pwd)
+
+source $BIN/01_sample_input.sh
 
 PYTHON_DIR="src/main/python"
 
-# clean the output directory if it exits
-[ -d "$OUTPUT_DIR" ] && rm -r "$OUTPUT_DIR"
-# limit the input size to INPUT_LINE_LIMIT records
-gzcat "$INPUT_FILES" | head -n "$INPUT_LINE_LIMIT" > /tmp/input.csv
-
 time \
-  cat /tmp/input.csv                                    `: read input records` \
+  cat $INPUT_SAMPLED                                    `: read input records` \
   | python "${PYTHON_DIR}/sample_shapes.py" 2>/dev/null `: process them with the "mapper"` \
   | sort                                                `: sort the intermediate output` \
   | python "${PYTHON_DIR}/draw_tiles.py" 2>/dev/null    `: process the sorted records with the "reducer"` \
