@@ -11,6 +11,16 @@
     <format>jar</format>
   </formats>
   <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <!-- include python sources -->
+    <fileSet>
+      <directory>src/main/python</directory>
+    </fileSet>
+    <!-- include bin scripts -->
+    <fileSet>
+      <directory>bin</directory>
+    </fileSet>
+  </fileSets>
   <dependencySets>
     <!-- start with the project files -->
     <dependencySet>
