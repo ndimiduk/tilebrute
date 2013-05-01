@@ -22,7 +22,8 @@ PYTHON_DIR="src/main/python"
 # limit the input size to INPUT_LINE_LIMIT records
 gzcat "$INPUT_FILES" | head -n "$INPUT_LINE_LIMIT" > /tmp/input.csv
 
-hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar   `: launch hadoop` \
+time \
+  hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar `: launch hadoop` \
   -input /tmp/input.csv                           `: reading these input records` \
   -output "$OUTPUT_DIR"                           `: generating output in this directory` \
   -mapper "python ${PYTHON_DIR}/sample_shapes.py" `: using this mapper command` \
