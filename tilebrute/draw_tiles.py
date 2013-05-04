@@ -15,37 +15,38 @@ import io
 import mapnik
 
 from itertools import groupby
-from gdal2tiles import GlobalMercator
+from os.path import dirname
 from shapely.geometry import box, Point
-from sys import stdin, stderr
+from sys import path, stdin, stderr
+
+from tilebrute.core import print_status, inc_counter, emit, which, merc_srs
+
+try:
+    from gdal2tiles import GlobalMercator
+except ImportError:
+    # look for gdal2tiles in the system path
+    p = which('gdal2tiles.py')
+    if p:
+        path.append(dirname(p))
+        from gdal2tiles import GlobalMercator
+    else:
+        print_status('Unable to locate gdal2tiles.py in PYTHONPATH or PATH. Aborting.')
+        raise 
 
 # quadkey[zoom -z]
 # quadkey[levelOfDetail -i]
 
-# hadoop helpers
-
-def print_status(msg):
-    print >> stderr, "reporter:status:%s" % msg
-
-def inc_counter(group, counter):
-    print >> stderr, "reporter:counter:_r_%s,%s,1" % (group, counter)
-
-def emit(key, val):
-    print "%s\t%s" % (key, val)
-
 # geo helpers
 
-# spherical mercator
-_merc_srs = '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over<>'
-
-def tile_to_meters_Box2d(tile, _merc = GlobalMercator()):
+def tile_to_meters_Box2d(tile):
     """
     From a 'tile string' of the form tx,ty,zoom', create a mapnik.Box2d
     corresponding to that tile's extend in meters.
     """
+    merc = GlobalMercator()
     tx,ty,z = [int(x) for x in tile.split(',')]
-    tx,ty = _merc.GoogleTile(tx,ty,z)
-    return mapnik.Box2d(*_merc.TileBounds(tx, ty, z))
+    tx,ty = merc.GoogleTile(tx,ty,z)
+    return mapnik.Box2d(*merc.TileBounds(tx, ty, z))
 
 class Peekable:
     """
@@ -168,7 +169,7 @@ def read_points(file):
         yield (rec[0],float(rec[1]),float(rec[2]))
 
 def init_map(seq):
-    m = mapnik.Map(256, 256, _merc_srs)
+    m = mapnik.Map(256, 256, merc_srs)
     m.background_color = mapnik.Color('white')
     s = mapnik.Style()
     r = mapnik.Rule()
@@ -177,13 +178,13 @@ def init_map(seq):
     m.append_style('point_style', s)
     TuplesDatasource.set_source(seq)
     ds = mapnik.Python(factory='TuplesDatasource')
-    layer = mapnik.Layer('file', _merc_srs)
+    layer = mapnik.Layer('file', merc_srs)
     layer.datasource = ds
     layer.styles.append('point_style')
     m.layers.append(layer)
     return m
 
-if __name__=='__main__':
+def main():
     tiles = set()
     for tile,points in groupby(read_points(stdin), lambda x: x[0]):
         assert tile not in tiles, "I've already seen this tile! Is the input sorted? %s %s" % (tile, tiles)
@@ -191,5 +192,7 @@ if __name__=='__main__':
         map.zoom_all()
         im = mapnik.Image(256,256)
         mapnik.render(map,im)
-#        im.save(tile + '.png', 'png')
         emit(tile, encode_image(im))
+
+if __name__=='__main__':
+    main()

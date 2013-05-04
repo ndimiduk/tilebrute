@@ -18,24 +18,29 @@
 import csv
 import ogr
 
-from gdal2tiles import GlobalMercator
+from os.path import dirname
 from random import uniform
-from sys import stdin, stderr, maxsize
+from sys import path, stdin, maxsize
 
-# hadoop helpers
+from tilebrute.core import print_status, inc_counter, emit, which
 
-def print_status(msg):
-    print >> stderr, "reporter:status:%s" % msg
+try:
+    from gdal2tiles import GlobalMercator
+except ImportError:
+    # look for gdal2tiles in the system path
+    p = which('gdal2tiles.py')
+    if p:
+        path.append(dirname(p))
+        from gdal2tiles import GlobalMercator
+    else:
+        print_status('Unable to locate gdal2tiles.py in PYTHONPATH or PATH. Aborting.')
+        raise 
 
-def inc_counter(group, counter):
-    print >> stderr, "reporter:counter:_m_%s,%s,1" % (group, counter)
-
-def emit(key, val):
-    print "%s\t%s" % (key, val)
+# increase buffers to account for really big geometries
+csv.field_size_limit(maxsize)
 
 # geo helpers
 
-_merc = GlobalMercator()
 _zooms = (6,7,8)
 
 def make_point(x, y):
@@ -69,9 +74,6 @@ def bbox(geom):
     return (ll,bb,rr,tt)
 
 # job code
-
-# increase buffers to account for really big geometries
-csv.field_size_limit(maxsize)
 
 def read_feature(file):
     """
@@ -111,16 +113,20 @@ def make_kv(lat, lng):
     Yield all the Google (tile,x,y)'s for the lng,lat pair at various zoom levels.
     Converts lng,lat into meters.
     """
+    merc = GlobalMercator()
     for z in _zooms:
-        mx,my = _merc.LatLonToMeters(lat, lng)
-        tx,ty = _merc.MetersToTile(mx, my, z)
-        tx,ty = _merc.GoogleTile(tx,ty,z)
+        mx,my = merc.LatLonToMeters(lat, lng)
+        tx,ty = merc.MetersToTile(mx, my, z)
+        tx,ty = merc.GoogleTile(tx,ty,z)
         key = "%d,%d,%d" % (tx,ty,z)
         value = "%0.5f\t%0.5f" % (mx,my)
         yield (key, value)
 
-if __name__=='__main__':
+def main():
     for geom, population in read_feature(stdin):
         for lng, lat in sample_geometry(geom, population):
             for key, val in make_kv(lat, lng):
                 emit(key, val)
+
+if __name__=='__main__':
+    main()
