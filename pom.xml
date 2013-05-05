@@ -36,7 +36,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <version.hadoop>1.0.4</version.hadoop>
+    <version.hadoop>1.0.3</version.hadoop>
   </properties>
 
   <dependencies>
