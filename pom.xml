@@ -84,13 +84,13 @@
         <version>2.3</version>
         <executions>
           <execution>
-            <id>hadoop-job-jar</id>
+            <id>uberjar</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
             <configuration>
-              <descriptor>src/assemblies/hadoop-job-jar.xml</descriptor>
+              <descriptor>src/assemblies/uberjar.xml</descriptor>
               <appendAssemblyId>false</appendAssemblyId>
               <archive>
                 <manifest>
