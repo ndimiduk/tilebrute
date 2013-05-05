@@ -14,10 +14,11 @@ config = {
 #    'download_url': 'Where to download it.',
     'author_email': 'printf(\'%s@%s.com\', \'ndimiduk\', \'gmail\')',
     'version': '0.1.0',
-    'install_requires': ['GDAL', 'nose'],
-    'packages': ['tilebrute'],
+    'install_requires': ['GDAL', 'mrjob', 'nose'],
+    'package_dir': {'': 'src/main/python'},
+    'packages' : ['tilebrute'],
     'scripts': [],
-    'name': 'tile-brute'
+    'name': 'tilebrute'
 }
 
 setup(**config)
