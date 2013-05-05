@@ -3,6 +3,10 @@
 # run this script on your instance type of choice to build appropriate
 # binaries. Be sure to update the `bucketname` variable.
 #
+# Inspiration for this script and its sibling came from the lovely,
+# detailed post http://arthurgerigk.blogspot.com/2012/05/post-test.html
+# and  https://forums.aws.amazon.com/thread.jspa?threadID=71189.
+#
 # Launch an instance with the this command:
 #   $ elastic-mapreduce --create --alive \
 #     --instance-group=master \
