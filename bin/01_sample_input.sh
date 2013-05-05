@@ -9,7 +9,9 @@ export INPUT_LINE_LIMIT=${INPUT_LINE_LIMIT-'11'}
 export INPUT_SAMPLED=${INPUT_SAMPLED-'/tmp/input.csv'}
 export OUTPUT_DIR=${WRITE_TILES_OUT-'out'}
 
+CAT="gunzip -c"
+
 # clean the output directory if it exits
 [ -d "$OUTPUT_DIR" ] && rm -r "$OUTPUT_DIR"
 # limit the input size to INPUT_LINE_LIMIT records
-gzcat "$INPUT_FILES" | head -n "$INPUT_LINE_LIMIT" > $INPUT_SAMPLED
+$CAT "$INPUT_FILES" | head -n "$INPUT_LINE_LIMIT" > $INPUT_SAMPLED
