@@ -16,14 +16,14 @@ BIN=$(cd $BIN > /dev/null ; pwd)
 
 source $BIN/01_sample_input.sh
 
-PYTHON_DIR="src/main/python"
+PYTHON=${PYTHON-'python'}
 
 time \
   hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar `: launch hadoop` \
   -input $INPUT_SAMPLED                           `: reading these input records` \
   -output "$OUTPUT_DIR"                           `: generating output in this directory` \
-  -mapper "python ${PYTHON_DIR}/sample_shapes.py" `: using this mapper command` \
-  -reducer "python ${PYTHON_DIR}/draw_tiles.py"   `: and this reducer command`
+  -mapper "$PYTHON -m tilebrute.sample_shapes"    `: using this mapper command` \
+  -reducer "$PYTHON -m tilebrute.draw_tiles"      `: and this reducer command`
 
 # count the output records
 [ "$?" -eq "0" ] && wc -l "${OUTPUT_DIR}/part-00000"

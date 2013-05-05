@@ -15,14 +15,14 @@ BIN=$(cd $BIN > /dev/null ; pwd)
 
 source $BIN/01_sample_input.sh
 
-PYTHON_DIR="src/main/python"
+PYTHON=${PYTHON-'python'}
 
 time \
   hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar \
   -input $INPUT_SAMPLED \
   -output "$OUTPUT_DIR" \
-  -mapper "python ${PYTHON_DIR}/sample_shapes.py" \
-  -reducer "python ${PYTHON_DIR}/draw_tiles.py" \
+  -mapper "$PYTHON tilebrute.sample_shapes" \
+  -reducer "$PYTHON tilebrute.draw_tiles" \
   `: instruct Hadoop to use the custom OutputFormat` \
   -outputformat tilebrute.hadoop.mapred.MapTileOutputFormat
 

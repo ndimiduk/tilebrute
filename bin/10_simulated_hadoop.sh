@@ -15,14 +15,14 @@ BIN=$(cd $BIN > /dev/null ; pwd)
 
 source $BIN/01_sample_input.sh
 
-PYTHON_DIR="src/main/python"
+PYTHON=${PYTHON-'python'}
 
 time \
-  cat $INPUT_SAMPLED                                    `: read input records` \
-  | python "${PYTHON_DIR}/sample_shapes.py" 2>/dev/null `: process them with the "mapper"` \
-  | sort                                                `: sort the intermediate output` \
-  | python "${PYTHON_DIR}/draw_tiles.py" 2>/dev/null    `: process the sorted records with the "reducer"` \
-  | python "${PYTHON_DIR}/write_tiles.py"               `: write the output records with a simulated OutputFormat`
+  cat $INPUT_SAMPLED                               `: read input records` \
+  | $PYTHON -m tilebrute.sample_shapes 2>/dev/null `: process them with the "mapper"` \
+  | sort                                           `: sort the intermediate output` \
+  | $PYTHON -m tilebrute.draw_tiles 2>/dev/null    `: process the sorted records with the "reducer"` \
+  | $PYTHON -m tilebrute.write_tiles               `: write the output records with a simulated OutputFormat`
 
 # count the output records
 [ "$?" -eq "0" ] && find $OUTPUT_DIR | grep \\.png$ | wc -l `: finally, print and count the number of output records`
