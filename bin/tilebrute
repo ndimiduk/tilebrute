@@ -1,22 +1,28 @@
 #!/usr/bin/env python
 #
 # A MRJob definition for TileBrute. This is how we'll normalize
-# launching the job locally in pseudo-distributed mode and on the
-# cloud.
+# launching the job locally in pseudo-distributed mode and on EMR.
 #
-# {Inline,Local}MRJobRunners don't actually work, for reasons I don't
-# understand.
+# Before running the job, you'll need to build the java component if
+# you haven't already.
+#   $ mvn clean package
 #
 # To use with HadoopJobRunner:
-# $ HADOOP_HOME=/path/to/hadoop/install \
-#   python ./src/main/python/job.py -r hadoop
-#   /path/to/input.csv \
-#   --no-output -o out # <- these are important because otherwise
-#                      #    MRJob will attempt to print your pngs
-#                      #    to stdout o.O
+#   $ HADOOP_HOME=/path/to/hadoop/install \
+#     tilebrute -r hadoop \
+#     --no-output -o out \ # <- these are important because otherwise
+#                          #    MRJob will attempt to print your pngs
+#                          #    to stdout o.O
+#     /path/to/input.csv
 #
 # To use with EMRJobRunner:
-# ???
+#   $ AWS_ACCESS_KEY_ID=<aws-access-key> \
+#     AWS_SECRET_ACCESS_KEY=<aws-secret-key> \
+#     tilebrute \
+#     -r emr \
+#     --no-output \
+#     --output-dir s3://path/to/output/tiles/
+#     s3://path/to/input
 #
 
 from mrjob.job import MRJob
@@ -31,10 +37,10 @@ class TileBrute(MRJob):
     HADOOP_OUTPUT_FORMAT = 'tilebrute.hadoop.mapred.MapTileOutputFormat'
 
     def mapper_cmd(self):
-        return bash_wrap('python ${PYTHON_DIR}/sample_shapes.py')
+        return bash_wrap('$PYTHON -m tilebrute.sample_shapes')
 
     def reducer_cmd(self):
-        return bash_wrap('python ${PYTHON_DIR}/draw_tiles.py')
+        return bash_wrap('$PYTHON -m tilebrute.draw_tiles')
 
 if __name__ == '__main__':
     TileBrute.run()
