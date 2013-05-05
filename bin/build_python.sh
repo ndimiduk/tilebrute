@@ -1,11 +1,20 @@
 #!/bin/bash -e
+#
+# run this script on your instance type of choice to build appropriate
+# binaries. Be sure to update the `bucketname` variable.
+#
+# Launch an instance with the this command:
+#   $ elastic-mapreduce --create --alive \
+#     --instance-group=master \
+#     --instance-count=1 \
+#     --instance-type=m1.large \
+#     --bid-price=0.240
+#
 
-#
-# elastic-mapreduce --create --alive --instance-group=master --instance-count=1 --instance-type=c1.xlarge --bid-price=0.450
-#
+## !!!configure me!!!
+bucketname="tile-brute-us-west-2"
 
 # set a couple useful variables
-bucketname="tile-brute-us-west-2"
 ARCH=`uname -m`
 
 # install build dependencies we can

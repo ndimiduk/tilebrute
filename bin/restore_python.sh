@@ -3,6 +3,10 @@
 bucketname="tile-brute-us-west-2"
 ARCH=$(uname -m)
 
+# this is important to ensure the virtualenv directory is restored in
+# the right place.
+cd ~
+
 sudo apt-get -y install libtiff-dev libfreetype6-dev libxml2-dev libproj-dev libtool libcurl4-openssl-dev libgeos-dev
 
 hadoop fs -get s3://$bucketname/emr_resources/dependencies/sqlite-autoconf-3070603-$ARCH.tar.gz ./
