@@ -16,7 +16,7 @@ BIN=$(cd $BIN > /dev/null ; pwd)
 
 source $BIN/01_sample_input.sh
 
-PYTHON=${PYTHON-'python'}
+PYTHON=${PYTHON-$(which python)}
 
 time \
   hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar `: launch hadoop` \

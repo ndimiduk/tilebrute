@@ -15,7 +15,7 @@ BIN=$(cd $BIN > /dev/null ; pwd)
 
 source $BIN/01_sample_input.sh
 
-PYTHON=${PYTHON-'python'}
+PYTHON=${PYTHON-$(which python)}
 
 time \
   cat $INPUT_SAMPLED                               `: read input records` \
