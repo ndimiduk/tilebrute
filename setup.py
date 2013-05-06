@@ -17,7 +17,7 @@ config = {
     'install_requires': ['GDAL', 'Shapely', 'mapnik2', 'mrjob', 'nose'],
     'package_dir': {'': 'src/main/python'},
     'packages' : ['tilebrute'],
-    'scripts': ['bin/tilebrute'],
+    'scripts': ['bin/tilebrute', 'bin/01_sample_input.sh', 'bin/10_simulated_hadoop.sh'],
     'name': 'tilebrute'
 }
 
