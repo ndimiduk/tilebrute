@@ -14,7 +14,7 @@ config = {
 #    'download_url': 'Where to download it.',
     'author_email': 'printf(\'%s@%s.com\', \'ndimiduk\', \'gmail\')',
     'version': '0.1.0',
-    'install_requires': ['GDAL', 'Shapely', 'mapnik2', 'mrjob', 'nose'],
+    'install_requires': ['GDAL==1.9.1', 'Shapely==1.2.17', 'mapnik2==2.1.0.5', 'mrjob==0.4', 'nose'],
     'package_dir': {'': 'src/main/python'},
     'packages' : ['tilebrute'],
     'scripts': ['bin/tilebrute', 'bin/01_sample_input.sh',
