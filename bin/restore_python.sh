@@ -55,5 +55,8 @@ cd ..
 hadoop fs -get s3://$bucketname/emr_resources/dependencies/TILE_BRUTE-virtualenv-$ARCH.tar.gz ./
 tar xzf TILE_BRUTE-virtualenv-$ARCH.tar.gz
 
+# uncomment this line to always get the latest version of tilebrute
+TILE_BRUTE-virtualenv-x86_64/bin/pip install -U git+https://github.com/ndimiduk/tile-brute.git
+
 # confirm everything worked
 ./TILE_BRUTE-virtualenv-$ARCH/bin/python -c 'import mapnik ; import gdal ; import tilebrute'
