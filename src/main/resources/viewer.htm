@@ -49,16 +49,28 @@
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span3">
-          <!-- div class="well">
-            <h3>Current:</h3>
-            <span id="coords">&nbsp;</span>
+          <div class="well">
+            <h3>Current position:</h3>
+            <span id="coords"></span>
             <hr />
+            <!--
             <h3>Zoom to:</h3>
             <form>
               <label>lat:</label>
               <input type="text" id="lat" />
               <label>lng:</label>
               <input type="text" id="lng" />
+            </form>
+            <hr />
+            -->
+            <h3>Base layer:</h3>
+            <form>
+              <select id="tiles">
+                <option value="../../../out/{z}/{x}/{y}.png" selected>localhost</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run7/{z}/{x}/{y}.png">WA</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run12/{z}/{x}/{y}.png">CA</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run17/{z}/{x}/{y}.png">West Coast</option>
+              </select>
             </form>
           </div><!--/.well-->
         </div><!--/span-->
@@ -78,22 +90,58 @@
     <script src="http://leafletjs.com/dist/leaflet.js"></script>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script>
-      var map1 = L.map('map1').setView([47.42809, -120.30029], 6);
-      L.tileLayer('../../../out/{z}/{x}/{y}.png', {
-        maxZoom: 8,
-        attribution: 'tile-brute viewer'
-      }).addTo(map1);
-      var popup = L.popup();
-      function onMapClick(e) {
-        popup.setLatLng(e.latlng)
-             .setContent("You clicked the map at " + e.latlng.toString())
-             .openOn(map1);
-      }
-      map1.on('click', onMapClick);
-      function onMapMove(e) {
-        $("coords").text(map1.getCenter());
-      }
-      map1.on('move', onMapMove);
+      var tileLayer;
+      var centers = {
+        'localhost': [47.42809, -120.30029],
+        'WA': [47.42809, -120.30029],
+        'CA': [37.43997, -120.08057],
+        'West Coast': [37.43997, -120.08057],
+      };
+
+      var setCoords = function(m) {
+        $("#coords").text(m.getCenter().toString());
+      };
+
+      var renderMap = function(layerSrc) {
+        var m = L.map('map1').setView([47.42809, -120.30029], 6);
+        tileLayer = L.tileLayer(layerSrc, {
+          maxZoom: 8,
+          attribution: 'tile-brute viewer'
+        });
+        tileLayer.addTo(m);
+        var popup = L.popup();
+        function onMapMove(e) {
+          setCoords(m)
+        }
+        m.on('move', onMapMove);
+        setCoords(m);
+        return m;
+      };
+
+      var setTiles = function(m, layerSrc) {
+        m.removeLayer(tileLayer);
+        tileLayer = L.tileLayer(layerSrc, {
+          maxZoom: 8,
+          attribution: 'tile-brute viewer'
+        });
+        tileLayer.addTo(m);
+      };
+
+      var center = function(map) {
+        var x = $("#tiles option:selected").text();
+        map.panTo(centers[x]);
+        if (z !== undefined) {
+          setZoom(parseInt(z));
+        }
+      };
+
+      $(function() {
+        var map = renderMap($('#tiles').val());
+        $("#tiles").change(function() {
+          setTiles(map, $("#tiles option:selected").val());
+          center(map);
+        });
+      });
     </script>
   </body>
 </html>
