@@ -25,4 +25,4 @@ time \
   | $PYTHON -m tilebrute.write_tiles               `: write the output records with a simulated OutputFormat`
 
 # count the output records
-[ "$?" -eq "0" ] && find $OUTPUT_DIR | grep \\.png$ | wc -l `: finally, print and count the number of output records`
+[ "$?" -eq "0" ] && find $WRITE_TILES_OUT | grep \\.png$ | wc -l `: finally, print and count the number of output records`
