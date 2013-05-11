@@ -159,6 +159,40 @@ def encode_image(im):
     s = base64.encodestring(im.tostring('png'))
     return s.replace('\n','')
 
+def get_zoom(tile):
+    (tx,ty,z) = tile.split(",")
+    return int(z)
+
+def pointWeight(zoom):
+    if zoom == 4:
+        return 0.05333
+    elif zoom == 5:
+        return 0.08
+    elif zoom == 6:
+        return 0.12
+    elif zoom == 7:
+        return 0.18
+    elif zoom == 8:
+        return 0.27
+    elif zoom == 9:
+        return 0.405
+    elif zoom == 10:
+        return 0.6075
+    elif zoom == 11:
+        return 0.91125
+    elif zoom == 12:
+        return 1.366875
+    elif zoom == 13:
+        return 2.0503125
+    elif zoom == 14:
+        return 3.07546875
+    elif zoom == 15:
+        return 4.61320312
+    elif zoom == 16:
+        return 6.9198046
+    elif zoom == 17:
+        return 10.37970
+
 def read_points(file):
     reader = csv.reader(file, delimiter="\t", strict=True)
     for rec in reader:
@@ -168,12 +202,19 @@ def read_points(file):
         inc_counter("read_points", "valid_input")
         yield (rec[0],float(rec[1]),float(rec[2]))
 
-def init_map(seq):
+def init_map(zoom, seq):
     m = mapnik.Map(256, 256, merc_srs)
     m.background_color = mapnik.Color('white')
     s = mapnik.Style()
     r = mapnik.Rule()
-    r.symbols.append(mapnik.PointSymbolizer())
+    sym = mapnik.MarkersSymbolizer()
+    sym.fill = mapnik.Color('black')
+    sym.spacing = 0.0
+    sym.opacity = opacity(zoom)
+    sym.height = mapnik.Expression(str(pointWeight(zoom)))
+    sym.width = mapnik.Expression(str(pointWeight(zoom)))
+    sym.allow_overlap = True
+    r.symbols.append(sym)
     s.rules.append(r)
     m.append_style('point_style', s)
     TuplesDatasource.set_source(seq)
@@ -185,10 +226,9 @@ def init_map(seq):
     return m
 
 def main():
-    tiles = set()
     for tile,points in groupby(read_points(stdin), lambda x: x[0]):
-        assert tile not in tiles, "I've already seen this tile! Is the input sorted? %s %s" % (tile, tiles)
-        map = init_map(points)
+        zoom = get_zoom(tile)
+        map = init_map(zoom, points)
         map.zoom_all()
         im = mapnik.Image(256,256)
         mapnik.render(map,im)
