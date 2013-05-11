@@ -210,7 +210,6 @@ def init_map(zoom, seq):
     sym = mapnik.MarkersSymbolizer()
     sym.fill = mapnik.Color('black')
     sym.spacing = 0.0
-    sym.opacity = opacity(zoom)
     sym.height = mapnik.Expression(str(pointWeight(zoom)))
     sym.width = mapnik.Expression(str(pointWeight(zoom)))
     sym.allow_overlap = True
