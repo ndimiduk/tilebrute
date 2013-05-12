@@ -41,7 +41,8 @@ csv.field_size_limit(maxsize)
 
 # geo helpers
 
-_zooms = (6,7,8)
+#_zooms = (6,7,8)
+_zooms = range(4,18)
 
 def make_point(x, y):
     return ogr.Geometry(wkt="POINT(%f %f)" % (x, y))
