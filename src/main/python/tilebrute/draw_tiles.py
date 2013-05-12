@@ -60,30 +60,29 @@ class Peekable:
         else:
             # last one!
     """
-    _null = object()
 
     def __init__(self, it):
         self._it = iter(it)
-        self._cache = Peekable._null
+        self._cache = None
 
     def __iter__(self):
         return self
 
     def next(self):
-        if self._cache is Peekable._null:
+        if not self._cache:
             return self._it.next()
         else:
             ret = self._cache
-            self._cache = Peekable._null
+            self._cache = None
             return ret
 
     def peek(self):
-        if self._cache is Peekable._null:
+        if not self._cache:
             self._cache = self.next()
         return self._cache
 
     def has_next(self):
-        if self._cache is Peekable._null:
+        if not self._cache:
             try: self._cache = self.next()
             except StopIteration: return False
             else: return True
@@ -229,12 +228,16 @@ def init_map(zoom, seq):
 
 def main():
     for tile,points in groupby(read_points(stdin), lambda x: x[0]):
-        zoom = get_zoom(tile)
-        map = init_map(zoom, points)
-        map.zoom_all()
-        im = mapnik.Image(256,256)
-        mapnik.render(map,im)
-        emit(tile, encode_image(im))
+        try:
+            zoom = get_zoom(tile)
+            map = init_map(zoom, points)
+            map.zoom_all()
+            im = mapnik.Image(256,256)
+            mapnik.render(map,im)
+            emit(tile, encode_image(im))
+        except Exception as e:
+            print_status("Error while rendering tile %s: %s" % (tile,e))
+            raise e
 
 if __name__=='__main__':
     main()
