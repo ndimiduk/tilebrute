@@ -198,17 +198,11 @@ def pointWeight(zoom):
 
 def read_points(file):
     reader = csv.reader(file, delimiter="\t", strict=True)
-    valid_input = 0
     for rec in reader:
-        if valid_input == 10000:
-            inc_counter("read_points", "valid_input", valid_input)
-            valid_input = 0
         if len(rec) != 3:
             inc_counter("read_points", "invalid_input")
             continue
-        valid_input += 1
         yield (rec[0],float(rec[1]),float(rec[2]))
-    inc_counter("read_points", "valid_input", valid_input)
 
 def init_map(zoom, seq):
     m = mapnik.Map(256, 256, merc_srs)
