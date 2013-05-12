@@ -214,7 +214,14 @@ def init_map(zoom, seq):
     sym.opacity = opacity(zoom)
     sym.height = mapnik.Expression(str(pointWeight(zoom)/2.0))
     sym.width = mapnik.Expression(str(pointWeight(zoom)/2.0))
+
+    # Ignore placement instructs Mapnik to avoid building the quadtree
+    # collision cache and helps performance if you know you want to
+    # allow for overlaps between features.
+    #        - Dane
     sym.allow_overlap = True
+    sym.ignore_placement = True
+
     r.symbols.append(sym)
     s.rules.append(r)
     m.append_style('point_style', s)
