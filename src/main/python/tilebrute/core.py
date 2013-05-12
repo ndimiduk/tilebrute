@@ -7,8 +7,10 @@ from sys import stderr
 def print_status(msg):
     print >> stderr, "reporter:status:%s" % msg
 
-def inc_counter(group, counter):
-    print >> stderr, "reporter:counter:_m_%s,%s,1" % (group, counter)
+def inc_counter(group, counter, inc=None):
+    if not inc:
+        inc = 1
+    print >> stderr, "reporter:counter:%s,%s,%d" % (group, counter, inc)
 
 def emit(key, val):
     print "%s\t%s" % (key, val)

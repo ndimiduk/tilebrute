@@ -81,16 +81,23 @@ def read_feature(file):
     and a population count. yield (org.Geometry, int(population))
     """
     reader = csv.reader(file, strict=True)
+    feature_count = 0
     for row in reader:
+        # this is the outter loop; send a status update every once in a while
+        if feature_count == 10000:
+            inc_counter("read_feature", "feature_count", feature_count)
+            feature_count = 0
+
         if row[0].lower() == "wkt":
             inc_counter("read_feature", "skipped_lines")
             continue
-        inc_counter("read_feature", "feature_count")
+        feature_count += 1
         geom = ogr.Geometry(wkt=row[0])
         if not geom:
             inc_counter("read_feature", "invalid_geom")
             continue
         yield (geom, int(row[8]))
+    inc_counter("read_feature", "feature_count", feature_count)
 
 def sample_geometry(geom, count):
     """
@@ -98,15 +105,20 @@ def sample_geometry(geom, count):
     """
     ll,bb,rr,tt = bbox(geom)
     point = None
+    success_sample = 0
+    fail_sample = 0
     for i in range(count):
         while True:
             point = make_point(uniform(ll, rr), uniform(bb, tt))
             if geom.Contains(point):
-                inc_counter("sample_geometry", "success_sample")
+                success_sample += 1
                 break
             else:
-                inc_counter("sample_geometry", "fail_sample")
+                fail_sample += 1
         yield (point.GetX(), point.GetY())
+    inc_counter("sample_geometry", "success_sample", success_sample)
+    inc_counter("sample_geometry", "fail_sample", fail_sample)
+
 
 def make_kv(lat, lng):
     """
@@ -114,8 +126,8 @@ def make_kv(lat, lng):
     Converts lng,lat into meters.
     """
     merc = GlobalMercator()
+    mx,my = merc.LatLonToMeters(lat, lng)
     for z in _zooms:
-        mx,my = merc.LatLonToMeters(lat, lng)
         tx,ty = merc.MetersToTile(mx, my, z)
         tx,ty = merc.GoogleTile(tx,ty,z)
         key = "%d,%d,%d" % (tx,ty,z)
