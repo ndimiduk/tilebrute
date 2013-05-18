@@ -3,7 +3,8 @@
 world.*
 110m-admin-0-countries*
 gdal2tiles.py
-out
+out*
+WA*
 
 # java stuff
 target
