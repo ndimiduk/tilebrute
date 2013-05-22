@@ -10,7 +10,7 @@ except ImportError:
 config = {
     'description': 'Create map tiles with Hadoop.',
     'author': 'Nick Dimiduk',
-    'url': 'https://github.com/ndimiduk/tile-brute',
+    'url': 'https://github.com/ndimiduk/tilebrute',
 #    'download_url': 'Where to download it.',
     'author_email': 'printf(\'%s@%s.com\', \'ndimiduk\', \'gmail\')',
     'version': '0.1.0',

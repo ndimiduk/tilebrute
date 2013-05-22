@@ -18,7 +18,7 @@ source $BIN/01_sample_input.sh
 PYTHON=${PYTHON-$(which python)}
 
 time \
-  hadoop jar target/tile-brute-0.1.0-SNAPSHOT.jar \
+  hadoop jar target/tilebrute-0.1.0-SNAPSHOT.jar \
   -input $INPUT_SAMPLED \
   -output "$OUTPUT_DIR" \
   -mapper "$PYTHON -m tilebrute.sample_shapes" \

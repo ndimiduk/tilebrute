@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>tile-brute viewer</title>
+    <title>tilebrute viewer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />
     <!--[if lte IE 8]><link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.ie.css" /><![endif]-->
@@ -46,7 +46,7 @@
           <a class="brand" href="#">tilebrute</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="https://github.com/ndimiduk/tile-brute">Visit tilebrute on Github</a></li>
+              <li><a href="https://github.com/ndimiduk/tilebrute">Visit tilebrute on Github</a></li>
               <li><a href="https://www.n10k.com">n10.com</a></li>
             </ul>
           </div>
@@ -103,7 +103,7 @@
               and <a href="https://twitter.com/ewedistrict">@ewedistrict</a>'s <a href="http://bmander.com/dotmap/index.html">Census
               Dotmap</a>. Source code and documentation on how you can
               brute your own tiles available
-              on <a href="https://github.com/ndimiduk/tile-brute">Github</a>.
+              on <a href="https://github.com/ndimiduk/tilebrute">Github</a>.
               I'm <a href="https://twitter.com/xefyr">@xefyr</a>, you
               can find out more about me at <a href="http://www.n10k.com">n10k.com</a>.
             </p -->
@@ -117,7 +117,7 @@
       <hr>
 
       <footer>
-        <p><a href="https://github.com/ndimiduk/tile-brute">Tilebrute</a>
+        <p><a href="https://github.com/ndimiduk/tilebrute">Tilebrute</a>
         is brought to you by Nick Dimiduk. Find out more
         at <a href="http://www.n10k.com">n10k.com</a>.</p>
       </footer>
@@ -146,7 +146,7 @@
         }).setView([47.42809, -120.30029], 6);
         tileLayer = L.tileLayer(layerSrc, {
           maxZoom: 17,
-          attribution: 'tiled by <a href="https://github.com/ndimiduk/tile-brute">tilebrute</a>.'
+          attribution: 'tiled by <a href="https://github.com/ndimiduk/tilebrute">tilebrute</a>.'
         });
         tileLayer.addTo(m);
         var popup = L.popup();
@@ -162,7 +162,7 @@
         m.removeLayer(tileLayer);
         tileLayer = L.tileLayer(layerSrc, {
           maxZoom: 17,
-          attribution: 'tiled by <a href="https://github.com/ndimiduk/tile-brute">tilebrute</a>.'
+          attribution: 'tiled by <a href="https://github.com/ndimiduk/tilebrute">tilebrute</a>.'
         });
         tileLayer.addTo(m);
       };

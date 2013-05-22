@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>tile-brute</groupId>
-  <artifactId>tile-brute</artifactId>
+  <groupId>tilebrute</groupId>
+  <artifactId>tilebrute</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Tile Brute</name>
   <description>Hadoop tools for generating map tiles.</description>
-  <url>https://github.com/ndimiduk/tile-brute</url>
+  <url>https://github.com/ndimiduk/tilebrute</url>
 
   <licenses>
     <license>
@@ -19,9 +19,9 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:git@github.com:ndimiduk/tile-brute.git</connection>
-    <developerConnection>scm:git:git@github.com:ndimiduk/tile-brute.git</developerConnection>
-    <url>http://github.com/ndimiduk/tile-brute.git</url>
+    <connection>scm:git:git@github.com:ndimiduk/tilebrute.git</connection>
+    <developerConnection>scm:git:git@github.com:ndimiduk/tilebrute.git</developerConnection>
+    <url>http://github.com/ndimiduk/tilebrute.git</url>
   </scm>
 
   <distributionManagement>

@@ -121,7 +121,7 @@ virtualenv --distribute TILE_BRUTE-virtualenv-$ARCH
 source TILE_BRUTE-virtualenv-$ARCH/bin/activate
 
 # install tilebrute and dependencies
-pip install -U git+https://github.com/ndimiduk/tile-brute.git
+pip install -U git+https://github.com/ndimiduk/tilebrute.git
 
 # confirm everything worked
 ./TILE_BRUTE-virtualenv-$ARCH/bin/python -c 'import mapnik ; import gdal ; import tilebrute'
