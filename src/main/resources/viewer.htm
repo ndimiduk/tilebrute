@@ -11,10 +11,12 @@
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      .leaflet-container {
+        background: #FFF;
+      }
       .sidebar-nav {
         padding: 9px 0;
       }
-
       @media (max-width: 980px) {
         /* Enable use of floated navbar text */
         .navbar-text.pull-right {
@@ -41,7 +43,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">tile-brute</a>
+          <a class="brand" href="#">tilebrute</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="https://github.com/ndimiduk/tile-brute">Visit tilebrute on Github</a></li>
+              <li><a href="https://www.n10k.com">n10.com</a></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -50,11 +58,11 @@
       <div class="row-fluid">
         <div class="span3">
           <div class="well">
-            <h3>Current position:</h3>
+            <h3>Current position</h3>
             <span id="coords"></span>
             <hr />
             <!--
-            <h3>Zoom to:</h3>
+            <h3>Zoom to</h3>
             <form>
               <label>lat:</label>
               <input type="text" id="lat" />
@@ -63,16 +71,43 @@
             </form>
             <hr />
             -->
-            <h3>Base layer:</h3>
+            <h3>Base layer</h3>
             <form>
               <select id="tiles">
                 <option value="../../../out/{z}/{x}/{y}.png" selected>localhost</option>
                 <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run7/{z}/{x}/{y}.png">WA</option>
-                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run12/{z}/{x}/{y}.png">CA</option>
-                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run17/{z}/{x}/{y}.png">West Coast</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run21/{z}/{x}/{y}.png">CA</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run19/{z}/{x}/{y}.png">West Coast 3</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run22/{z}/{x}/{y}.png">West Coast All</option>
+                <option value="https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run27/{z}/{x}/{y}.png">US, interrupted</option>
               </select>
             </form>
           </div><!--/.well-->
+          <div class="well">
+            <h3>About</h3>
+            <p>
+              Tilebrute is an experiment in rendering map tiles using
+              <a href="http://hadoop.apache.org/docs/r1.0.4/streaming.html">Hadoop</a>.
+              It's built in Python with a touch of Java. It leans
+              heavily on <a href="http://www.gdal.org/">GDAL</a> and
+              <a href="http://mapnik.org/">Mapnik</a>, two open source
+              GIS tools. Tiles were rendered on EC2 using
+              the <a href="http://aws.amazon.com/elasticmapreduce/">AWS
+              Elastic MapReduce</a> service and are served out of S3.
+              The map control
+              is <a href="http://leafletjs.com/">leaflet</a>.
+            </p>
+            <!-- p>Tilebrute was originally inspired
+              by <a href="https://twitter.com/younghahn">@younghahn</a>'s <a href="http://mapbox.com/blog/rendering-the-world/">Rendering
+              the World</a> presentation
+              and <a href="https://twitter.com/ewedistrict">@ewedistrict</a>'s <a href="http://bmander.com/dotmap/index.html">Census
+              Dotmap</a>. Source code and documentation on how you can
+              brute your own tiles available
+              on <a href="https://github.com/ndimiduk/tile-brute">Github</a>.
+              I'm <a href="https://twitter.com/xefyr">@xefyr</a>, you
+              can find out more about me at <a href="http://www.n10k.com">n10k.com</a>.
+            </p -->
+          </div>
         </div><!--/span-->
         <div class="span9">
           <div id="map1" style="width: 886px; height: 600px"></div>
@@ -82,7 +117,9 @@
       <hr>
 
       <footer>
-        <p>tile-brute</p>
+        <p><a href="https://github.com/ndimiduk/tile-brute">Tilebrute</a>
+        is brought to you by Nick Dimiduk. Find out more
+        at <a href="http://www.n10k.com">n10k.com</a>.</p>
       </footer>
 
     </div><!--/.fluid-container-->
@@ -99,14 +136,17 @@
       };
 
       var setCoords = function(m) {
-        $("#coords").text(m.getCenter().toString());
+        $("#coords").text("Z(" + m.getZoom() + ") " + m.getCenter().toString());
       };
 
       var renderMap = function(layerSrc) {
-        var m = L.map('map1').setView([47.42809, -120.30029], 6);
+        var m = L.map('map1', {
+          minZoom: 4,
+          maxZoom: 17
+        }).setView([47.42809, -120.30029], 6);
         tileLayer = L.tileLayer(layerSrc, {
-          maxZoom: 8,
-          attribution: 'tile-brute viewer'
+          maxZoom: 17,
+          attribution: 'tiled by <a href="https://github.com/ndimiduk/tile-brute">tilebrute</a>.'
         });
         tileLayer.addTo(m);
         var popup = L.popup();
@@ -121,8 +161,8 @@
       var setTiles = function(m, layerSrc) {
         m.removeLayer(tileLayer);
         tileLayer = L.tileLayer(layerSrc, {
-          maxZoom: 8,
-          attribution: 'tile-brute viewer'
+          maxZoom: 17,
+          attribution: 'tiled by <a href="https://github.com/ndimiduk/tile-brute">tilebrute</a>.'
         });
         tileLayer.addTo(m);
       };
