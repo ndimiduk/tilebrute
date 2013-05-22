@@ -45,7 +45,7 @@ csv.field_size_limit(maxsize)
 # http://wiki.openstreetmap.org/wiki/Tile_Disk_Usage, the view rate of
 # tiles at z16 is only 6.7%. Save yourself some serious s3 costs by
 # not rendering those last couple levels.
-_zooms = range(4,17)
+_zooms = range(6,9)
 
 def make_point(x, y):
     return ogr.Geometry(wkt="POINT(%f %f)" % (x, y))
