@@ -24,7 +24,7 @@ time \
   -mapper "$PYTHON -m tilebrute.sample_shapes" \
   -reducer "$PYTHON -m tilebrute.draw_tiles" \
   `: instruct Hadoop to use the custom OutputFormat` \
-  -outputformat tilebrute.hadoop.mapred.MapTileOutputFormat
+  -outputformat tilebrute.hadoop.mapred.MBTilesOutputFormat
 
 # count the output records
 [ "$?" -eq "0" ] && find "$OUTPUT_DIR" | grep \\.png$ | wc -l

@@ -15,7 +15,7 @@ import org.apache.hadoop.util.Progressable;
 
 /**
  * Write tiles out to disk in as "output-path/{z}/{x}/{y}.png". Generates lots
- * of small files and will likely make NN unhappy, but great for KVFS
+ * of small files and will likely make NN unhappy, but acceptable for KVFS
  * implementations.
  */
 public class MapTileOutputFormat extends FileOutputFormat<Text, Text> {
