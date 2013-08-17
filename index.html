@@ -10,8 +10,20 @@
     <meta name="description" content="Tilebrute is a Hadoop MapReduce application for rendering map tiles.">
     <meta name="author" content="Nick Dimiduk">
 
-    <!-- Le styles -->
     <link href="css/bootstrap-2.3.2.min.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive-2.3.2.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" /-->
+    <link rel="stylesheet" href="css/leaflet-0.6.4.css" />
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="css/leaflet.ie-0.6.4.css" />
+    <![endif]-->
+
     <style type="text/css">
       body {
         padding-top: 20px;
@@ -45,22 +57,13 @@
       #map {
         height: 350px;
       }
+      .container-map {
+        margin: 0px;
+      }
       .leaflet-container {
         background: #FFF;
       }
     </style>
-    <link href="css/bootstrap-responsive-2.3.2.min.css" rel="stylesheet">
-
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="js/html5shiv.js"></script>
-    <![endif]-->
-
-    <!-- link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" /-->
-    <link rel="stylesheet" href="css/leaflet-0.6.4.css" />
-    <!--[if lte IE 8]>
-      <link rel="stylesheet" href="css/leaflet.ie-0.6.4.css" />
-    <![endif]-->
   </head>
 
   <body>
