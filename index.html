@@ -136,10 +136,13 @@
 
     </div> <!-- /container-narrow -->
 
+    <script src="js/jquery-1.10.2.js"></script>
     <script src="js/bootstrap-2.3.2.min.js"></script>
     <script src="js/leaflet-0.6.4.js"></script>
     <script>
-      var map = L.map('map').setView([37.43997, -120.08057], 6);
+      var map = L.map('map')
+        .setView([37.43997, -120.08057], 6)
+        .setMaxBounds([[24.520833, -124.766667], [49.384472, -66.95]]); // conus
       L.tileLayer('https://s3-us-west-2.amazonaws.com/tile-brute-us-west-2/out/run22/{z}/{x}/{y}.png', {
         maxZoom: 14,
         attribution: 'tiled by <a href="https://github.com/ndimiduk/tilebrute">Tilebrute</a>.'
